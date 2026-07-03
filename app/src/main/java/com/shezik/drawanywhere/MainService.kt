@@ -39,7 +39,7 @@ import androidx.core.app.ServiceCompat
 import com.shezik.drawanywhere.view.DismissTargetView
 import com.shezik.drawanywhere.view.ToolbarLifecycleOwner
 import com.shezik.drawanywhere.view.canvas.NativeDrawCanvasView
-import com.shezik.drawanywhere.view.toolbar.DrawToolbar
+import com.shezik.drawanywhere.view.toolbar.MiniToolbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -107,7 +107,7 @@ class MainService : Service() {
         // -------- Setup toolbar (Compose) --------
         toolbarLifecycleOwner.start()
         toolbarView = ComposeView(this).apply {
-            setContent { DrawToolbar(viewModel = viewModel) }
+            setContent { MiniToolbar(viewModel = viewModel) }
         }
         toolbarLifecycleOwner.attachTo(toolbarView)
 
