@@ -28,6 +28,12 @@ android {
                 "proguard-rules.pro"
             )
         }
+        debug {
+            // Distinct package + label so this build installs alongside the
+            // original DrawAnywhere instead of clashing on signature.
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-pdd"
+        }
     }
 
     compileOptions {
