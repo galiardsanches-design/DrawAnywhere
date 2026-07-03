@@ -13,6 +13,10 @@
     <string name="stroke_eraser">Stroke Eraser</string>
     <string name="pixel_eraser">Pixel Eraser</string>
     <string name="laser">Laser</string>
+    <string name="line">Solid line</string>
+    <string name="double_line">Double solid line</string>
+    <string name="dashed_line">Dashed line</string>
+    <string name="arrow">Arrow</string>
     <string name="color">Color</string>
     <string name="width">Width</string>
     <string name="opacity">Opacity</string>

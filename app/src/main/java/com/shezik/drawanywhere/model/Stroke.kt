@@ -24,6 +24,9 @@ data class Stroke(
     fun render(canvas: Canvas, paint: Paint) {
         if (_points.isEmpty()) return
         paint.strokeWidth = width
+        // Reset any path effect a previous stroke's renderer may have left on the
+        // shared paint (e.g. the dashed-line renderer), so styles never leak.
+        paint.pathEffect = null
         val argb = color.toArgb()
         val combinedAlpha = (color.alpha * alpha * 255).toInt().coerceIn(0, 255)
         paint.color = (argb and 0x00FFFFFF) or (combinedAlpha shl 24)

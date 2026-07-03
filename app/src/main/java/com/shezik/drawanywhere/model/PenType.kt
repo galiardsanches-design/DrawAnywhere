@@ -1,18 +1,27 @@
 package com.shezik.drawanywhere.model
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.BlurOn
 import androidx.compose.material.icons.filled.CropSquare
+import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FlashOn
+import androidx.compose.material.icons.filled.HorizontalRule
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.shezik.drawanywhere.R
+import com.shezik.drawanywhere.drawing.ArrowRenderer
+import com.shezik.drawanywhere.drawing.DashedLineRenderer
+import com.shezik.drawanywhere.drawing.DoubleLineRenderer
 import com.shezik.drawanywhere.drawing.EdgeHitTester
 import com.shezik.drawanywhere.drawing.FreehandTool
 import com.shezik.drawanywhere.drawing.HitTester
 import com.shezik.drawanywhere.drawing.LaserRenderer
+import com.shezik.drawanywhere.drawing.LineRenderer
+import com.shezik.drawanywhere.drawing.LineTool
 import com.shezik.drawanywhere.drawing.OvalRenderer
 import com.shezik.drawanywhere.drawing.PenRenderer
 import com.shezik.drawanywhere.drawing.PixelEraserTool
@@ -35,6 +44,10 @@ enum class PenType(
 ) {
     Pen(R.string.pen, Icons.Default.Edit, PenRenderer, SegmentHitTester),
     Laser(R.string.laser, Icons.Default.FlashOn, LaserRenderer, SegmentHitTester, ttlMs = 3_000L),
+    Line(R.string.line, Icons.Default.HorizontalRule, LineRenderer, SegmentHitTester),
+    DoubleLine(R.string.double_line, Icons.Default.DragHandle, DoubleLineRenderer, SegmentHitTester),
+    DashedLine(R.string.dashed_line, Icons.Default.MoreHoriz, DashedLineRenderer, SegmentHitTester),
+    Arrow(R.string.arrow, Icons.Default.ArrowForward, ArrowRenderer, SegmentHitTester),
     Rectangle(R.string.rectangle, Icons.Default.CropSquare, RectRenderer, EdgeHitTester),
     Ellipse(R.string.ellipse, Icons.Default.RadioButtonUnchecked, OvalRenderer, EdgeHitTester),
     StrokeEraser(R.string.stroke_eraser, InkEraser24Px, PenRenderer, SegmentHitTester, isEraser = true),
@@ -44,6 +57,7 @@ enum class PenType(
 
     fun createTool(ctx: ToolContext): StrokeTool = when (this) {
         Pen, Laser -> FreehandTool(ctx)
+        Line, DoubleLine, DashedLine, Arrow -> LineTool(ctx)
         Rectangle, Ellipse -> ShapeTool(ctx)
         StrokeEraser -> StrokeEraserTool(ctx)
         PixelEraser -> PixelEraserTool(ctx)

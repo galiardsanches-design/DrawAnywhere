@@ -1,0 +1,24 @@
+<resources>
+    <string name="tools">Инструменты</string>
+    <string name="pen">Перо</string>
+    <string name="laser">Лазер</string>
+    <string name="line">Сплошная линия</string>
+    <string name="double_line">Двойная сплошная</string>
+    <string name="dashed_line">Прерывистая линия</string>
+    <string name="arrow">Стрелка</string>
+    <string name="rectangle">Прямоугольник</string>
+    <string name="ellipse">Эллипс</string>
+    <string name="stroke_eraser">Ластик (штрих)</string>
+    <string name="pixel_eraser">Ластик (пиксель)</string>
+    <string name="color">Цвет</string>
+    <string name="width">Толщина</string>
+    <string name="opacity">Прозрачность</string>
+    <string name="undo">Отменить</string>
+    <string name="redo">Повторить</string>
+    <string name="clear_canvas">Очистить холст</string>
+    <string name="hide_canvas">Скрыть холст</string>
+    <string name="show_canvas">Показать холст</string>
+    <string name="settings">Настройки</string>
+    <string name="tool_controls">Настройки инструмента</string>
+    <string name="quit">Выход</string>
+</resources>
