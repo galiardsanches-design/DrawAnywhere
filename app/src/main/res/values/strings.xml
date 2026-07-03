@@ -18,6 +18,13 @@
     <string name="double_line">Double solid line</string>
     <string name="dashed_line">Dashed line</string>
     <string name="arrow">Arrow</string>
+    <string name="turn_arrow">Turn arrow</string>
+    <string name="stop_line">Stop line</string>
+    <string name="zebra">Pedestrian crossing</string>
+    <string name="save">Save to gallery</string>
+    <string name="background">Canvas background</string>
+    <string name="saved_to_gallery">Saved to gallery</string>
+    <string name="save_failed">Save failed</string>
     <string name="color">Color</string>
     <string name="width">Width</string>
     <string name="opacity">Opacity</string>

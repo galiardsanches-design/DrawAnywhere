@@ -17,12 +17,14 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 package com.shezik.drawanywhere.view.canvas
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.view.MotionEvent
 import android.view.View
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.toArgb
+import com.shezik.drawanywhere.CanvasBackground
 import com.shezik.drawanywhere.DrawController
 import com.shezik.drawanywhere.DrawViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -114,6 +116,8 @@ class NativeDrawCanvasView(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
+        drawBackground(canvas)
+
         val vp = viewModel.viewport.value
 
         drawController.removeExpiredStrokes(System.currentTimeMillis())
@@ -191,6 +195,30 @@ class NativeDrawCanvasView(
         if (drawController.strokeList.any { it.penType.isEphemeral }) {
             postInvalidateDelayed(FRAME_INTERVAL_MS)
         }
+    }
+
+    private fun drawBackground(canvas: Canvas) {
+        when (viewModel.uiState.value.canvasBackground) {
+            CanvasBackground.WHITE -> canvas.drawColor(android.graphics.Color.WHITE)
+            CanvasBackground.GREY -> canvas.drawColor(0xFF3A3A3A.toInt())
+            CanvasBackground.NONE -> {}
+        }
+    }
+
+    /** Render the current canvas (background + all strokes) to a bitmap for export. */
+    fun renderToBitmap(): Bitmap {
+        val w = if (width > 0) width else 1
+        val h = if (height > 0) height else 1
+        val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        val c = Canvas(bmp)
+        drawBackground(c)
+        val vp = viewModel.viewport.value
+        c.save()
+        c.translate(-vp.panX * vp.zoom, -vp.panY * vp.zoom)
+        c.scale(vp.zoom, vp.zoom)
+        for (stroke in drawController.strokeList) stroke.render(c, pathPaint)
+        c.restore()
+        return bmp
     }
 
     // ── Viewport observation (for HUD updates) ────────────────────

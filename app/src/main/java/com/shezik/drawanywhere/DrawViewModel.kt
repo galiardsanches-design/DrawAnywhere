@@ -29,8 +29,11 @@ import com.shezik.drawanywhere.view.toolbar.ToolbarOrientation
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn
@@ -43,6 +46,9 @@ data class ServiceState(
     val toolbarActive: Boolean = true
 )
 
+/** Solid canvas backdrop for drawing PDD schemes from scratch. */
+enum class CanvasBackground { NONE, WHITE, GREY }
+
 data class UiState(
     val canvasVisible: Boolean = true,
     val canvasPassthrough: Boolean = false,
@@ -53,6 +59,7 @@ data class UiState(
 
     val currentPenType: PenType = PenType.Pen,
     val penConfigs: Map<PenType, PenConfig> = defaultPenConfigs(),
+    val canvasBackground: CanvasBackground = CanvasBackground.NONE,
 
     val toolbarOrientation: ToolbarOrientation = ToolbarOrientation.HORIZONTAL,
     val firstDrawerOpen: Boolean = canvasVisible,
@@ -261,6 +268,24 @@ class DrawViewModel(
     fun clearCanvas() = controller.clearStrokes()
     fun undo() = controller.undo()
     fun redo() = controller.redo()
+
+    // --- Canvas background (PDD scheme mode) ---
+
+    fun cycleCanvasBackground() = _uiState.update {
+        it.copy(canvasBackground = when (it.canvasBackground) {
+            CanvasBackground.NONE -> CanvasBackground.WHITE
+            CanvasBackground.WHITE -> CanvasBackground.GREY
+            CanvasBackground.GREY -> CanvasBackground.NONE
+        })
+    }
+
+    // --- Save to gallery ---
+
+    private val _saveRequests = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val saveRequests: SharedFlow<Unit> = _saveRequests.asSharedFlow()
+
+    /** Ask the service to render the canvas to a bitmap and save it to the gallery. */
+    fun requestSave() { _saveRequests.tryEmit(Unit) }
 
     private var dimmingJob: Job? = null
 

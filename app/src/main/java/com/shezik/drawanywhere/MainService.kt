@@ -20,12 +20,17 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
+import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.ServiceInfo
+import android.graphics.Bitmap
 import android.graphics.PixelFormat
 import android.graphics.Point
 import android.os.Build
+import android.os.Environment
 import android.os.IBinder
+import android.provider.MediaStore
+import android.widget.Toast
 import android.view.Gravity
 import android.view.View
 import android.view.WindowInsets
@@ -187,6 +192,22 @@ class MainService : Service() {
             }
         }
 
+        // Observe save requests → render the canvas to a PNG in the gallery
+        serviceScope.launch {
+            viewModel.saveRequests.collect {
+                val ok = try {
+                    saveBitmapToGallery(canvasView.renderToBitmap())
+                } catch (e: Exception) {
+                    false
+                }
+                Toast.makeText(
+                    this@MainService,
+                    getString(if (ok) R.string.saved_to_gallery else R.string.save_failed),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+
         isRunning = true
     }
 
@@ -234,6 +255,35 @@ class MainService : Service() {
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
+
+    /** Save [bmp] as a PNG into the gallery (Pictures/DrawAnywhere). */
+    private fun saveBitmapToGallery(bmp: Bitmap): Boolean {
+        val name = "PDD_" + System.currentTimeMillis() + ".png"
+        return try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val values = ContentValues().apply {
+                    put(MediaStore.Images.Media.DISPLAY_NAME, name)
+                    put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+                    put(
+                        MediaStore.Images.Media.RELATIVE_PATH,
+                        Environment.DIRECTORY_PICTURES + "/DrawAnywhere"
+                    )
+                }
+                val uri = contentResolver.insert(
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values
+                ) ?: return false
+                contentResolver.openOutputStream(uri)?.use { out ->
+                    bmp.compress(Bitmap.CompressFormat.PNG, 100, out)
+                } ?: return false
+                true
+            } else {
+                @Suppress("DEPRECATION")
+                MediaStore.Images.Media.insertImage(contentResolver, bmp, name, "DrawAnywhere scheme") != null
+            }
+        } catch (e: Exception) {
+            false
+        }
+    }
 
     private fun createNotificationChannel() {
         val channel = NotificationChannel(

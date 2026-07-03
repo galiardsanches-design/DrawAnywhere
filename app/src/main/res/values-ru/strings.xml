@@ -7,6 +7,13 @@
     <string name="double_line">Двойная сплошная</string>
     <string name="dashed_line">Прерывистая линия</string>
     <string name="arrow">Стрелка</string>
+    <string name="turn_arrow">Стрелка поворота</string>
+    <string name="stop_line">Стоп-линия</string>
+    <string name="zebra">Пешеходный переход</string>
+    <string name="save">Сохранить в галерею</string>
+    <string name="background">Фон холста</string>
+    <string name="saved_to_gallery">Сохранено в галерею</string>
+    <string name="save_failed">Не удалось сохранить</string>
     <string name="rectangle">Прямоугольник</string>
     <string name="ellipse">Эллипс</string>
     <string name="stroke_eraser">Ластик (штрих)</string>

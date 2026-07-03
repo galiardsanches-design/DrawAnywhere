@@ -78,8 +78,24 @@ internal fun createAllToolbarButtons(
     onChangeFingerDrawingEnabled: (Boolean) -> Unit,
     onCycleLockMode: () -> Unit,
     lockMode: LockMode,
-    onQuitApplication: () -> Unit
+    onQuitApplication: () -> Unit,
+    onSave: () -> Unit,
+    onCycleBackground: () -> Unit
 ): List<ToolbarButton> = listOf(
+    ToolbarButton(
+        id = "save",
+        icon = Icons.Default.SaveAlt,
+        contentDescription = stringResource(R.string.save),
+        isEnabled = uiState.canvasVisible,
+        onClick = onSave
+    ),
+    ToolbarButton(
+        id = "background",
+        icon = Icons.Default.Wallpaper,
+        contentDescription = stringResource(R.string.background),
+        isEnabled = uiState.canvasVisible,
+        onClick = onCycleBackground
+    ),
     ToolbarButton(
         id = "visibility",
         icon = if (uiState.canvasVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,

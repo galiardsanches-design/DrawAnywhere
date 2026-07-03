@@ -65,7 +65,9 @@ fun DrawToolbar(
         onChangeFingerDrawingEnabled = viewModel::setFingerDrawingEnabled,
         onCycleLockMode = viewModel::cycleLockMode,
         lockMode = lockMode,
-        onQuitApplication = viewModel::quitApplication
+        onQuitApplication = viewModel::quitApplication,
+        onSave = viewModel::requestSave,
+        onCycleBackground = viewModel::cycleCanvasBackground
     ).associateBy { it.id }
 
     DrawAnywhereTheme {

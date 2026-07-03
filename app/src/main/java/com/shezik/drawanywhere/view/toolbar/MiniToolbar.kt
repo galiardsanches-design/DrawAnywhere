@@ -67,13 +67,15 @@ fun MiniToolbar(
         onChangeFingerDrawingEnabled = viewModel::setFingerDrawingEnabled,
         onCycleLockMode = viewModel::cycleLockMode,
         lockMode = lockMode,
-        onQuitApplication = viewModel::quitApplication
+        onQuitApplication = viewModel::quitApplication,
+        onSave = viewModel::requestSave,
+        onCycleBackground = viewModel::cycleCanvasBackground
     ).associateBy { it.id }
 
     // Curated single-row order (icon only). horizontalScroll keeps it on screen.
     val order = listOf(
-        "tool_controls", "color_picker", "undo", "redo",
-        "clear", "visibility", "passthrough", "zoom_lock", "settings"
+        "tool_controls", "color_picker", "undo", "redo", "clear",
+        "save", "background", "visibility", "passthrough", "zoom_lock", "settings"
     )
 
     DrawAnywhereTheme {

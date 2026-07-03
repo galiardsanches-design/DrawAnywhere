@@ -3,6 +3,7 @@ package com.shezik.drawanywhere.drawing
 import android.graphics.Canvas
 import android.graphics.DashPathEffect
 import android.graphics.Paint
+import android.graphics.Path
 import com.shezik.drawanywhere.model.Stroke
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -104,5 +105,76 @@ object RoadRenderer : Renderer {
         canvas.drawLine(a.x, a.y, b.x, b.y, paint)
         paint.color = savedColor
         paint.strokeWidth = savedWidth
+    }
+}
+
+/**
+ * Pedestrian crossing (зебра). The drag a→b spans the crossing across the road;
+ * parallel white bars are laid perpendicular to it (along the travel direction).
+ */
+object ZebraRenderer : Renderer {
+    override fun render(stroke: Stroke, canvas: Canvas, paint: Paint, now: Long) {
+        val pts = stroke.points
+        if (pts.size < 2) return
+        val a = pts[0]; val b = pts[1]
+        val dx = b.x - a.x; val dy = b.y - a.y
+        val len = hypot(dx, dy)
+        if (len < 1f) return
+        val ux = dx / len; val uy = dy / len          // along a→b (across the road)
+        val px = -uy; val py = ux                      // perpendicular (travel dir)
+        val barHalf = (stroke.width * 6f).coerceAtLeast(40f)
+        val barW = (stroke.width * 2f).coerceAtLeast(10f)
+        paint.strokeWidth = barW
+        val period = barW * 2f
+        var d = period / 2f
+        while (d < len) {
+            val cx = a.x + ux * d; val cy = a.y + uy * d
+            canvas.drawLine(cx - px * barHalf, cy - py * barHalf, cx + px * barHalf, cy + py * barHalf, paint)
+            d += period
+        }
+    }
+}
+
+/** Stop line — толстая поперечная сплошная. */
+object StopLineRenderer : Renderer {
+    override fun render(stroke: Stroke, canvas: Canvas, paint: Paint, now: Long) {
+        val pts = stroke.points
+        if (pts.size < 2) return
+        val a = pts[0]; val b = pts[1]
+        paint.strokeWidth = (stroke.width * 4f).coerceAtLeast(24f)
+        canvas.drawLine(a.x, a.y, b.x, b.y, paint)
+    }
+}
+
+/** Curved turn arrow — стрелка поворота (дуга + наконечник в конце). */
+object TurnArrowRenderer : Renderer {
+    private const val HEAD_SPREAD = 0.5f
+
+    override fun render(stroke: Stroke, canvas: Canvas, paint: Paint, now: Long) {
+        val pts = stroke.points
+        if (pts.size < 2) return
+        val a = pts[0]; val b = pts[1]
+        val dx = b.x - a.x; val dy = b.y - a.y
+        val len = hypot(dx, dy)
+        if (len < 1f) return
+        val mx = (a.x + b.x) / 2f; val my = (a.y + b.y) / 2f
+        val px = -dy / len; val py = dx / len
+        val bend = len * 0.3f
+        val cx = mx + px * bend; val cy = my + py * bend   // bezier control point
+
+        val path = Path()
+        path.moveTo(a.x, a.y)
+        path.quadTo(cx, cy, b.x, b.y)
+        canvas.drawPath(path, paint)
+
+        // Arrowhead points along the tangent at the end (control→end direction).
+        val angle = atan2(b.y - cy, b.x - cx)
+        val headLen = (stroke.width * 6f).coerceAtLeast(28f)
+        val x1 = b.x - headLen * cos(angle - HEAD_SPREAD)
+        val y1 = b.y - headLen * sin(angle - HEAD_SPREAD)
+        val x2 = b.x - headLen * cos(angle + HEAD_SPREAD)
+        val y2 = b.y - headLen * sin(angle + HEAD_SPREAD)
+        canvas.drawLine(b.x, b.y, x1, y1, paint)
+        canvas.drawLine(b.x, b.y, x2, y2, paint)
     }
 }

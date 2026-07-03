@@ -5,12 +5,15 @@ import androidx.compose.material.icons.filled.AddRoad
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.BlurOn
 import androidx.compose.material.icons.filled.CropSquare
+import androidx.compose.material.icons.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FlashOn
 import androidx.compose.material.icons.filled.HorizontalRule
+import androidx.compose.material.icons.filled.Minimize
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
+import androidx.compose.material.icons.filled.TurnRight
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.shezik.drawanywhere.R
@@ -19,6 +22,9 @@ import com.shezik.drawanywhere.drawing.DashedLineRenderer
 import com.shezik.drawanywhere.drawing.DoubleLineRenderer
 import com.shezik.drawanywhere.drawing.EdgeHitTester
 import com.shezik.drawanywhere.drawing.RoadRenderer
+import com.shezik.drawanywhere.drawing.StopLineRenderer
+import com.shezik.drawanywhere.drawing.TurnArrowRenderer
+import com.shezik.drawanywhere.drawing.ZebraRenderer
 import com.shezik.drawanywhere.drawing.FreehandTool
 import com.shezik.drawanywhere.drawing.HitTester
 import com.shezik.drawanywhere.drawing.LaserRenderer
@@ -51,6 +57,9 @@ enum class PenType(
     DoubleLine(R.string.double_line, Icons.Default.DragHandle, DoubleLineRenderer, SegmentHitTester),
     DashedLine(R.string.dashed_line, Icons.Default.MoreHoriz, DashedLineRenderer, SegmentHitTester),
     Arrow(R.string.arrow, Icons.Default.ArrowForward, ArrowRenderer, SegmentHitTester),
+    TurnArrow(R.string.turn_arrow, Icons.Default.TurnRight, TurnArrowRenderer, SegmentHitTester),
+    StopLine(R.string.stop_line, Icons.Default.Minimize, StopLineRenderer, SegmentHitTester),
+    Zebra(R.string.zebra, Icons.Default.DirectionsWalk, ZebraRenderer, SegmentHitTester),
     Rectangle(R.string.rectangle, Icons.Default.CropSquare, RectRenderer, EdgeHitTester),
     Ellipse(R.string.ellipse, Icons.Default.RadioButtonUnchecked, OvalRenderer, EdgeHitTester),
     StrokeEraser(R.string.stroke_eraser, InkEraser24Px, PenRenderer, SegmentHitTester, isEraser = true),
@@ -60,7 +69,7 @@ enum class PenType(
 
     fun createTool(ctx: ToolContext): StrokeTool = when (this) {
         Pen, Laser -> FreehandTool(ctx)
-        Road, Line, DoubleLine, DashedLine, Arrow -> LineTool(ctx)
+        Road, Line, DoubleLine, DashedLine, Arrow, TurnArrow, StopLine, Zebra -> LineTool(ctx)
         Rectangle, Ellipse -> ShapeTool(ctx)
         StrokeEraser -> StrokeEraserTool(ctx)
         PixelEraser -> PixelEraserTool(ctx)
