@@ -1,6 +1,7 @@
 package com.shezik.drawanywhere.model
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddRoad
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.BlurOn
 import androidx.compose.material.icons.filled.CropSquare
@@ -17,6 +18,7 @@ import com.shezik.drawanywhere.drawing.ArrowRenderer
 import com.shezik.drawanywhere.drawing.DashedLineRenderer
 import com.shezik.drawanywhere.drawing.DoubleLineRenderer
 import com.shezik.drawanywhere.drawing.EdgeHitTester
+import com.shezik.drawanywhere.drawing.RoadRenderer
 import com.shezik.drawanywhere.drawing.FreehandTool
 import com.shezik.drawanywhere.drawing.HitTester
 import com.shezik.drawanywhere.drawing.LaserRenderer
@@ -44,6 +46,7 @@ enum class PenType(
 ) {
     Pen(R.string.pen, Icons.Default.Edit, PenRenderer, SegmentHitTester),
     Laser(R.string.laser, Icons.Default.FlashOn, LaserRenderer, SegmentHitTester, ttlMs = 3_000L),
+    Road(R.string.road, Icons.Default.AddRoad, RoadRenderer, SegmentHitTester),
     Line(R.string.line, Icons.Default.HorizontalRule, LineRenderer, SegmentHitTester),
     DoubleLine(R.string.double_line, Icons.Default.DragHandle, DoubleLineRenderer, SegmentHitTester),
     DashedLine(R.string.dashed_line, Icons.Default.MoreHoriz, DashedLineRenderer, SegmentHitTester),
@@ -57,7 +60,7 @@ enum class PenType(
 
     fun createTool(ctx: ToolContext): StrokeTool = when (this) {
         Pen, Laser -> FreehandTool(ctx)
-        Line, DoubleLine, DashedLine, Arrow -> LineTool(ctx)
+        Road, Line, DoubleLine, DashedLine, Arrow -> LineTool(ctx)
         Rectangle, Ellipse -> ShapeTool(ctx)
         StrokeEraser -> StrokeEraserTool(ctx)
         PixelEraser -> PixelEraserTool(ctx)
@@ -66,7 +69,8 @@ enum class PenType(
 
 data class PenConfig(
     val penType: PenType = PenType.Pen,
-    val color: Color = Color.Red,
+    // Road markings are white — default the drawing color to white.
+    val color: Color = Color.White,
     val width: Float = 5f,
     val alpha: Float = 1f
 )

@@ -204,7 +204,8 @@ class DrawViewModel(
     }
 
     fun setPenColor(color: Color, trackRecent: Boolean = true) {
-        updateCurrentPenConfig { copy(color = color) }
+        // Color is shared across all drawing tools: pick once, draw with any tool.
+        updateDrawingPenConfigs { copy(color = color) }
         if (trackRecent) addRecentColor(color)
     }
 
@@ -217,15 +218,31 @@ class DrawViewModel(
         _uiState.update { it.copy(recentColors = updated.take(6)) }
     }
 
-    fun setStrokeWidth(width: Float) = updateCurrentPenConfig { copy(width = width) }
+    fun setStrokeWidth(width: Float) {
+        // Width is shared across drawing tools; erasers keep their own width.
+        if (uiState.value.currentPenType.isEraser) updateCurrentPenConfig { copy(width = width) }
+        else updateDrawingPenConfigs { copy(width = width) }
+    }
 
-    fun setStrokeAlpha(alpha: Float) = updateCurrentPenConfig { copy(alpha = alpha) }
+    fun setStrokeAlpha(alpha: Float) = updateDrawingPenConfigs { copy(alpha = alpha) }
 
     private fun updateCurrentPenConfig(transform: PenConfig.() -> PenConfig) {
         _uiState.update { state ->
             val configs = state.penConfigs.toMutableMap()
             val current = configs[state.currentPenType] ?: PenConfig(penType = state.currentPenType)
             configs[state.currentPenType] = current.transform()
+            state.copy(penConfigs = configs)
+        }
+        controller.setPenConfig(uiState.value.currentPenConfig)
+    }
+
+    /** Apply a change to every non-eraser pen config so tool settings feel global. */
+    private fun updateDrawingPenConfigs(transform: PenConfig.() -> PenConfig) {
+        _uiState.update { state ->
+            val configs = state.penConfigs.toMutableMap()
+            for ((type, cfg) in state.penConfigs) {
+                if (!type.isEraser) configs[type] = cfg.transform()
+            }
             state.copy(penConfigs = configs)
         }
         controller.setPenConfig(uiState.value.currentPenConfig)

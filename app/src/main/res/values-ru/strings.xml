@@ -2,6 +2,7 @@
     <string name="tools">Инструменты</string>
     <string name="pen">Перо</string>
     <string name="laser">Лазер</string>
+    <string name="road">Дорога</string>
     <string name="line">Сплошная линия</string>
     <string name="double_line">Двойная сплошная</string>
     <string name="dashed_line">Прерывистая линия</string>

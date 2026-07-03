@@ -24,7 +24,7 @@ interface HitTester {
 
 object PenRenderer : Renderer {
     override fun render(stroke: Stroke, canvas: Canvas, paint: Paint, now: Long) {
-        canvas.drawPath(buildPath(stroke._points), paint)
+        canvas.drawPath(stroke.smoothPath(), paint)
     }
 
     fun buildPath(points: List<Offset>): Path {
@@ -76,7 +76,7 @@ object LaserRenderer : Renderer {
             else ((ttl - elapsed) / (ttl * (1f - FADE_START))).coerceIn(0f, 1f)
 
         val baseAlpha = paint.alpha.toFloat()
-        val path = PenRenderer.buildPath(stroke.points)
+        val path = stroke.smoothPath()
 
         // Glow: wider and dimmer, derived from the stroke's own color/alpha
         paint.strokeWidth = stroke.width * GLOW_WIDTH

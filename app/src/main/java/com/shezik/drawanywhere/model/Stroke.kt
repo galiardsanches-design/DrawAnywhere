@@ -2,9 +2,11 @@ package com.shezik.drawanywhere.model
 
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.Path
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import com.shezik.drawanywhere.drawing.PenRenderer
 
 enum class StrokeModifier {
     None, PrimaryButton, SecondaryButton, Both
@@ -20,6 +22,22 @@ data class Stroke(
     var modifiedAt: Long = createdAt,
 ) {
     val points: List<Offset> get() = _points
+
+    // Perf: cache the smoothed freehand Path so completed strokes aren't rebuilt
+    // every frame. Rebuilt only when the point count changes (points are only
+    // appended while drawing; erasers create fresh strokes).
+    private var _cachedPath: Path? = null
+    private var _cachedPointCount: Int = -1
+
+    /** Smoothed path for freehand/laser strokes, cached by point count. */
+    fun smoothPath(): Path {
+        val cached = _cachedPath
+        if (cached != null && _cachedPointCount == _points.size) return cached
+        val built = PenRenderer.buildPath(_points)
+        _cachedPath = built
+        _cachedPointCount = _points.size
+        return built
+    }
 
     fun render(canvas: Canvas, paint: Paint) {
         if (_points.isEmpty()) return
