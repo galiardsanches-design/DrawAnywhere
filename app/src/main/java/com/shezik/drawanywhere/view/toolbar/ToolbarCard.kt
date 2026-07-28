@@ -1,5 +1,6 @@
 package com.shezik.drawanywhere.view.toolbar
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
@@ -57,10 +58,14 @@ fun DraggableToolbarCard(
                     }
                 )
             },
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         shape = CircleShape,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.9f)
+            containerColor = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.94f)
+        ),
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
         )
     ) {
         content()

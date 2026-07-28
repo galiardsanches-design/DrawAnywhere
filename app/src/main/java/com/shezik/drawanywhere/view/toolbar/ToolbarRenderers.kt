@@ -4,6 +4,8 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -49,12 +51,17 @@ internal fun ToolbarExpandButton(
         animationSpec = tween(300, easing = FastOutSlowInEasing),
         label = "toggle_rotation"
     )
+    val containerColor by animateColorAsState(
+        targetValue = if (isExpanded) MaterialTheme.colorScheme.primaryContainer
+        else MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
+        animationSpec = tween(220),
+        label = "expand_button_bg"
+    )
     IconButton(
         onClick = onClick,
         modifier = modifier
             .background(
-                color = if (isExpanded) MaterialTheme.colorScheme.primaryContainer
-                else MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
+                color = containerColor,
                 shape = CircleShape
             )
     ) {
@@ -71,14 +78,21 @@ internal fun ToolbarExpandButton(
 @Composable
 internal fun AnimatedToolbarButton(modifier: Modifier, button: ToolbarButton) {
     val iconColor = button.color ?: MaterialTheme.colorScheme.onSurface
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
     val scale by animateFloatAsState(
-        targetValue = if (button.isEnabled) 1f else 0.9f,
-        animationSpec = tween(200),
+        targetValue = when {
+            isPressed && button.isEnabled -> 0.86f
+            button.isEnabled -> 1f
+            else -> 0.9f
+        },
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium),
         label = "button_scale"
     )
     IconButton(
         onClick = button.onClick ?: {},
         enabled = button.isEnabled,
+        interactionSource = interactionSource,
         modifier = modifier
             .graphicsLayer { scaleX = scale; scaleY = scale }
             .background(color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f), shape = CircleShape)
@@ -100,13 +114,18 @@ internal fun PopupToolbarButton(
     popupAlignment: Alignment
 ) {
     var isPopupOpen by remember { mutableStateOf(false) }
+    val containerColor by animateColorAsState(
+        targetValue = if (isPopupOpen) MaterialTheme.colorScheme.primaryContainer
+        else MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
+        animationSpec = tween(220),
+        label = "popup_button_bg"
+    )
     Box(modifier = modifier) {
         IconButton(
             onClick = { isPopupOpen = !isPopupOpen },
             enabled = button.isEnabled,
             modifier = Modifier.background(
-                color = if (isPopupOpen) MaterialTheme.colorScheme.primaryContainer
-                else MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
+                color = containerColor,
                 shape = CircleShape
             )
         ) {

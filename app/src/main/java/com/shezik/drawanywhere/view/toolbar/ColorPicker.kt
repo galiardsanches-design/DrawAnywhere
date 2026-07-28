@@ -1,5 +1,7 @@
 package com.shezik.drawanywhere.view.toolbar
 
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -9,12 +11,15 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -54,19 +59,34 @@ internal val PRESET_COLORS = listOf(
 
 @Composable
 private fun ColorSwatchButton(color: Color, isSelected: Boolean, onClick: () -> Unit) {
+    val borderWidth by animateDpAsState(
+        targetValue = if (isSelected) 3.dp else 1.dp,
+        animationSpec = tween(150),
+        label = "swatch_border"
+    )
     Box(
         modifier = Modifier
             .size(24.dp)
             .clip(CircleShape)
             .background(color)
             .border(
-                width = if (isSelected) 3.dp else 1.dp,
+                width = borderWidth,
                 color = if (isSelected) MaterialTheme.colorScheme.primary
                         else MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
                 shape = CircleShape
             )
-            .clickable { onClick() }
-    )
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        if (isSelected) {
+            Icon(
+                imageVector = Icons.Default.Check,
+                contentDescription = null,
+                tint = if (color.luminance() > 0.5f) Color.Black else Color.White,
+                modifier = Modifier.size(14.dp)
+            )
+        }
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
